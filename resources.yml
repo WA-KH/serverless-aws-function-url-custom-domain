@@ -6,7 +6,7 @@ Resources:
     Properties:
       DistributionConfig:
         Enabled: true
-        PriceClass: PriceClass_100
+        PriceClass: PriceClass_200
         HttpVersion: http2
         Comment: Kiralia Monitoring Console Distribution
         Origins:
