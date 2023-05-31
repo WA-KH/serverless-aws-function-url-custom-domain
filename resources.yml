@@ -1,6 +1,6 @@
 ---
 Resources:
-  ApiCloudFrontDistribution:
+  CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     DeletionPolicy: Delete
     Properties:
@@ -8,10 +8,10 @@ Resources:
         Enabled: true
         PriceClass: PriceClass_200
         HttpVersion: http2
-        Comment: Kiralia Monitoring Console Distribution
+        Comment: "Lambda FunctionURL {{{ domains }}}"
         Origins:
-          - Id: ApiGateway
-            DomainName: !Select [2, !Split ["/", !GetAtt NuxtSsrEngineLambdaFunctionUrl.FunctionUrl]]
+          - Id: LambdaFunctionURL
+            DomainName: { "Fn::Select": [2, {'Fn::Split': ["/", {'Fn::GetAtt': ["{{{ lambdaFunctionUrl }}}", FunctionUrl]}]}]} # extract function url form your lambda resource
             OriginPath: ''
             CustomOriginConfig:
               HTTPPort: 80
@@ -19,7 +19,7 @@ Resources:
               OriginProtocolPolicy: https-only
               OriginSSLProtocols: [TLSv1, TLSv1.1, TLSv1.2]
         DefaultCacheBehavior:
-          TargetOriginId: ApiGateway
+          TargetOriginId: LambdaFunctionURL
           ViewerProtocolPolicy: redirect-to-https
           Compress: true
           DefaultTTL: 0
@@ -43,12 +43,11 @@ Resources:
               - Authorization
             Cookies:
               Forward: all
-        Aliases:
-          - ${self:custom.urlDomain.apiDomain}
+        Aliases: "{{{ domains }}}"
         ViewerCertificate:
           SslSupportMethod: sni-only
-          MinimumProtocolVersion: TLSv1.2_2019
-          AcmCertificateArn: ${self:custom.urlDomain.certificateArn}
+          MinimumProtocolVersion: TLSv1.2_2021
+          AcmCertificateArn: "{{{certificateArn}}}"
 Outputs:
   CloudFrontDistributionDomain:
     Value:
